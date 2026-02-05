@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Benjamin McAneney — Technical Training Plan</title>
+<style>
+  /* ─── RESET & BASE ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue:         #3b82f6;
+    --blue-dim:     rgba(59,130,246,0.12);
+    --blue-border:  rgba(59,130,246,0.25);
+    --green:        #10b981;
+    --green-dim:    rgba(16,185,129,0.10);
+    --green-border: rgba(16,185,129,0.22);
+    --purple:       #8b5cf6;
+    --purple-dim:   rgba(139,92,246,0.10);
+    --purple-border:rgba(139,92,246,0.22);
+    --amber:        #f59e0b;
+    --amber-dim:    rgba(245,158,11,0.10);
+    --amber-border: rgba(245,158,11,0.22);
+    --slate:        #6b7280;
+    --card:         rgba(30,41,59,0.62);
+    --card-border:  rgba(100,116,139,0.18);
+    --text-hi:      #f1f5f9;
+    --text-mid:     #cbd5e1;
+    --text-lo:      #94a3b8;
+    --text-muted:   #64748b;
+    --text-footer:  #475569;
+  }
+
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--text-mid);
+    line-height: 1.5;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 80%, rgba(59,130,246,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(16,185,129,0.06) 0%, transparent 70%);
+  }
+
+  /* ─── LAYOUT ─── */
+  .shell {
+    position: relative; z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 28px 18px 48px;
+  }
+
+  /* ─── HEADER ─── */
+  .header { text-align: center; margin-bottom: 26px; }
+
+  .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 10px;
+    padding: 5px 18px;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 14px;
+  }
+
+  .header h1 {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, #f1f5f9, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+  }
+  .header .sub  { color: var(--text-lo);    font-size: 13px; margin-top: 6px; font-weight: 500; }
+  .header .det  { color: var(--text-muted); font-size: 12px; margin-top: 3px; }
+
+  /* ─── TAB RAIL ─── */
+  .tab-rail {
+    display: flex; gap: 5px;
+    background: rgba(30,41,59,0.7);
+    border: 1px solid rgba(100,116,139,0.15);
+    border-radius: 14px;
+    padding: 5px;
+    margin-bottom: 22px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tab-rail::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    color: var(--text-lo);
+    font-size: 12px; font-weight: 600;
+    padding: 8px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  }
+  .tab-btn:hover  { background: rgba(59,130,246,0.12); color: #fff; }
+  .tab-btn.active {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(59,130,246,0.3);
+  }
+
+  /* ─── PANELS ─── */
+  .panel { display: none; animation: fadeIn 0.22s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ─── INFO BOXES ─── */
+  .info-box {
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 18px;
+    font-size: 13px; line-height: 1.55;
+  }
+  .info-box.blue   { background: var(--blue-dim);   border: 1px solid var(--blue-border);   color: #93c5fd; }
+  .info-box.green  { background: var(--green-dim);  border: 1px solid var(--green-border);  color: #6ee7b7; }
+  .info-box.purple { background: var(--purple-dim); border: 1px solid var(--purple-border); color: #a78bfa; }
+  .info-box.amber  { background: var(--amber-dim);  border: 1px solid var(--amber-border);  color: #fbbf24; }
+
+  /* ─── WEEK ROTATION SELECTOR ─── */
+  .rotation-bar {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 14px;
+  }
+  .rotation-bar .rot-label { font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  .rot-btn {
+    background: rgba(30,41,59,0.7);
+    border: 1px solid rgba(100,116,139,0.25);
+    border-radius: 8px;
+    color: var(--text-lo);
+    font-size: 12px; font-weight: 600;
+    padding: 5px 14px;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s;
+  }
+  .rot-btn:hover { border-color: rgba(59,130,246,0.4); color: #fff; }
+  .rot-btn.active {
+    background: rgba(59,130,246,0.18);
+    border-color: var(--blue);
+    color: var(--blue);
+    box-shadow: 0 0 8px rgba(59,130,246,0.2);
+  }
+
+  /* ─── WEEKLY ROWS ─── */
+  .week-row {
+    display: flex; align-items: center; gap: 12px;
+    border-radius: 12px; padding: 11px 14px;
+    border: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .week-row:hover { border-color: rgba(100,116,139,0.25); }
+  .week-row.video  { background: rgba(59,130,246,0.07);  border-color: rgba(59,130,246,0.18); }
+  .week-row.self   { background: rgba(16,185,129,0.07);  border-color: rgba(16,185,129,0.18); }
+  .week-row.rest   { background: rgba(51,65,85,0.35);    opacity: 0.55; }
+
+  .week-row .day-name { min-width: 82px; font-weight: 700; font-size: 13px; color: var(--text-hi); flex-shrink: 0; }
+
+  .tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    border-radius: 20px; padding: 3px 10px;
+    font-size: 11px; font-weight: 600;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .tag.video  { background: rgba(59,130,246,0.18);  border: 1px solid rgba(59,130,246,0.30);  color: var(--blue); }
+  .tag.self   { background: rgba(16,185,129,0.18);  border: 1px solid rgba(16,185,129,0.30);  color: var(--green); }
+  .tag.rest   { background: rgba(107,114,128,0.22); border: 1px solid rgba(107,114,128,0.30); color: var(--slate); }
+  .tag svg    { width:14px; height:14px; }
+
+  .week-row .mid { flex: 1; min-width: 0; }
+  .week-row .focus        { font-size: 12.5px; color: var(--text-lo); }
+  .week-row .capsule-name { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-style: italic; }
+
+  .watch-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 11.5px; font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap; flex-shrink: 0;
+    text-decoration: none;
+    transition: opacity 0.18s, transform 0.1s;
+    box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+  }
+  .watch-btn:hover  { opacity: 0.88; }
+  .watch-btn:active { transform: scale(0.96); }
+  .watch-btn svg    { width: 13px; height: 13px; }
+
+  .watch-btn.ref {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 2px 8px rgba(16,185,129,0.3);
+  }
+
+  /* ─── SESSION TEMPLATE ─── */
+  .phase-block {
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid rgba(100,116,139,0.18);
+    background: var(--card);
+  }
+  .phase-block .stripe-wrap { display: flex; }
+  .phase-block .stripe      { width: 5px; flex-shrink: 0; }
+  .phase-block .stripe.amber  { background: var(--amber); }
+  .phase-block .stripe.purple { background: var(--purple); }
+  .phase-block .stripe.green  { background: var(--green); }
+  .phase-block .inner         { padding: 14px 16px; flex: 1; }
+
+  .phase-block .phase-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+  .phase-block .phase-head .icon  { font-size: 20px; line-height: 1; }
+  .phase-block .phase-head .title { font-weight: 700; font-size: 15px; color: var(--text-hi); }
+  .phase-block .phase-head .dur   { font-size: 11px; color: var(--text-muted); }
+
+  .bullet-list { list-style: none; }
+  .bullet-list li {
+    display: flex; gap: 9px; margin-bottom: 5px;
+    font-size: 12.5px; color: var(--text-mid); line-height: 1.5;
+  }
+  .bullet-list li .dot { flex-shrink:0; width:7px; height:7px; border-radius:50%; margin-top:7px; }
+  .bullet-list li .dot.amber  { background: var(--amber); }
+  .bullet-list li .dot.purple { background: var(--purple); }
+  .bullet-list li .dot.green  { background: var(--green); }
+  .bullet-list li .dot.blue   { background: var(--blue); }
+
+  /* core split */
+  .core-block {
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid rgba(99,102,241,0.25);
+    background: var(--card);
+  }
+  .core-head { padding: 13px 18px 0; display: flex; align-items: baseline; gap: 10px; }
+  .core-head .icon  { font-size: 20px; }
+  .core-head .title { font-weight: 700; font-size: 15px; color: var(--text-hi); }
+  .core-head .dur   { font-size: 11px; color: var(--text-muted); }
+
+  .core-cols { display: flex; margin-top: 12px; }
+  .core-col  { flex: 1; padding: 11px 14px 15px; }
+  .core-col.video { background: rgba(59,130,246,0.06);  border-top: 2px solid rgba(59,130,246,0.4); }
+  .core-col.self  { background: rgba(16,185,129,0.06);  border-top: 2px solid rgba(16,185,129,0.4); margin-left: 2px; }
+
+  .core-col .col-label       { font-size: 11px; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.03em; }
+  .core-col.video .col-label { color: var(--blue); }
+  .core-col.self  .col-label { color: var(--green); }
+
+  .core-col .bullet-list li .dot.col-video { background: var(--blue); }
+  .core-col .bullet-list li .dot.col-self  { background: var(--green); }
+  .core-col .bullet-list li { font-size: 12px; }
+
+  .core-col .pointer-note {
+    margin-top: 10px; padding: 7px 10px;
+    background: rgba(59,130,246,0.08);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 8px;
+    font-size: 11px; color: #93c5fd; line-height: 1.4;
+  }
+
+  /* quality checklist expandable */
+  .quality-section {
+    margin-top: 12px;
+    border-radius: 12px;
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+    overflow: hidden;
+  }
+  .quality-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .quality-header:hover { background: rgba(245,158,11,0.12); }
+  .quality-header .title-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .quality-header .icon { font-size: 18px; }
+  .quality-header .title { font-size: 13px; font-weight: 700; color: #fbbf24; }
+  .quality-header .chevron {
+    font-size: 16px; color: #fbbf24;
+    transition: transform 0.2s;
+  }
+  .quality-header.open .chevron { transform: rotate(90deg); }
+
+  .quality-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .quality-body.open { max-height: 600px; }
+  .quality-body .inner { padding: 0 14px 12px; }
+  .quality-item {
+    margin-bottom: 8px;
+    padding-left: 16px;
+    position: relative;
+  }
+  .quality-item::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #fbbf24;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .quality-item .label { font-weight: 600; font-size: 12px; color: var(--text-hi); }
+  .quality-item .desc  { font-size: 11.5px; color: var(--text-lo); line-height: 1.45; margin-top: 2px; }
+
+  .total-pill {
+    margin-top: 6px;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 10px;
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 13px; font-weight: 600; color: #60a5fa;
+  }
+
+  /* ─── 4-WEEK PROGRESSION ─── */
+  .week-card { border-radius: 14px; overflow: hidden; border: 1px solid rgba(100,116,139,0.18); }
+  .week-card .wk-header { display: flex; align-items: center; gap: 12px; padding: 11px 18px; }
+  .week-card .wk-badge  { border-radius: 10px; padding: 3px 11px; font-size: 11px; font-weight: 800; color: #fff; letter-spacing: 0.06em; white-space: nowrap; }
+  .week-card .wk-theme  { font-size: 16px; font-weight: 700; color: var(--text-hi); }
+  .week-card .wk-body   { padding: 12px 18px; background: var(--card); }
+  .week-card .wk-focus  { font-size: 13px; font-weight: 600; font-style: italic; margin-bottom: 8px; }
+  .week-card .wk-detail { display: flex; gap: 10px; margin-bottom: 5px; font-size: 12.5px; color: var(--text-mid); line-height: 1.5; }
+  .week-card .wk-detail .arrow { flex-shrink:0; font-size:11px; margin-top:2px; }
+  .progression-connector { text-align: center; color: var(--text-footer); font-size: 13px; margin: 4px 0; }
+
+  /* ─── COACHING CUES ─── */
+  .cues-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cue-card  { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px; }
+  .cue-card .cue-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .cue-card .cue-icon { font-size: 20px; line-height: 1; }
+  .cue-card .cue-cat  { font-weight: 700; font-size: 13px; color: var(--text-hi); }
+  .cue-card .cue-text { font-size: 12px; color: var(--text-lo); line-height: 1.45; }
+
+  /* ─── TIPS FOR PARENTS ─── */
+  .tip-card        { display: flex; gap: 14px; align-items: flex-start; background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px 16px; }
+  .tip-card .tip-icon  { font-size: 22px; flex-shrink: 0; line-height: 1.2; }
+  .tip-card .tip-title { font-weight: 700; font-size: 13.5px; color: var(--text-hi); margin-bottom: 3px; }
+  .tip-card .tip-text  { font-size: 12.5px; color: var(--text-lo); line-height: 1.45; }
+
+  .tip-card.featured {
+    border: 1px solid rgba(139,92,246,0.3);
+    background: rgba(139,92,246,0.08);
+  }
+  .tip-card.featured .tip-title { color: #a78bfa; }
+
+  .do-dont-grid { display: flex; gap: 10px; margin-top: 8px; }
+  .do-dont-col  { flex: 1; }
+  .do-dont-col .col-title {
+    font-size: 11px; font-weight: 700; margin-bottom: 5px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .do-dont-col.do   .col-title { color: #6ee7b7; }
+  .do-dont-col.dont .col-title { color: #fca5a5; }
+  .do-dont-item {
+    font-size: 11px; color: var(--text-lo); line-height: 1.4;
+    padding-left: 12px; position: relative; margin-bottom: 4px;
+  }
+  .do-dont-item::before {
+    content: '•';
+    position: absolute; left: 0;
+    font-weight: 700;
+  }
+  .do-dont-col.do   .do-dont-item::before { color: #6ee7b7; }
+  .do-dont-col.dont .do-dont-item::before { color: #fca5a5; }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    margin-top: 32px; padding-top: 18px;
+    border-top: 1px solid rgba(100,116,139,0.15);
+    text-align: center;
+    font-size: 11px; color: var(--text-footer); line-height: 1.7;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 520px) {
+    .shell { padding: 20px 14px 40px; }
+    .header h1 { font-size: 23px; }
+
+    .week-row { flex-wrap: wrap; gap: 8px 12px; padding: 12px 14px; }
+    .week-row .mid { order: 3; flex-basis: 100%; }
+    .watch-btn     { order: 4; margin-top: 2px; }
+
+    .core-cols { flex-direction: column; }
+    .core-col.self { margin-left: 0; margin-top: 2px; }
+    .cues-grid { grid-template-columns: 1fr; }
+    .do-dont-grid { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="header">
+    <div class="badge">Individual Development Plan — Technical Training</div>
+    <h1>Benjamin McAneney</h1>
+    <p class="sub">Home-Based Technical Training Plan</p>
+    <p class="det">5–6 Days / Week &nbsp;·&nbsp; 15–20 Min Per Session &nbsp;·&nbsp; Ball Only</p>
+  </header>
+
+  <nav class="tab-rail" role="tablist">
+    <button class="tab-btn active" data-tab="0" role="tab" aria-selected="true">Weekly Plan</button>
+    <button class="tab-btn"        data-tab="1" role="tab" aria-selected="false">Session Template</button>
+    <button class="tab-btn"        data-tab="2" role="tab" aria-selected="false">4-Week Progression</button>
+    <button class="tab-btn"        data-tab="3" role="tab" aria-selected="false">Coaching Cues</button>
+    <button class="tab-btn"        data-tab="4" role="tab" aria-selected="false">Tips for Parents</button>
+  </nav>
+
+  <section class="panel active" data-panel="0" role="tabpanel">
+    <div class="info-box blue">
+      <strong>How this plan works:</strong> Each week has
+      <strong style="color:#60a5fa">Video-Guided</strong> days and
+      <strong style="color:#34d399">Self-Directed</strong> days. On Video-Guided days Benjamin watches a
+      <strong>Ball Mastery Video Capsule</strong> (tap the button to open it), then practices around what he watched.
+      On Self-Directed days he works independently on a set focus. Sunday is always rest.
+    </div>
+
+    <div class="rotation-bar">
+      <span class="rot-label">Capsule rotation</span>
+      <button class="rot-btn active" data-rot="0">Week A</button>
+      <button class="rot-btn"        data-rot="1">Week B</button>
+    </div>
+
+    <div id="weekly-rows" style="display:flex; flex-direction:column; gap:8px;"></div>
+  </section>
+
+  <section class="panel" data-panel="1" role="tabpanel">
+
+    <div class="phase-block" style="margin-bottom:12px;">
+      <div class="stripe-wrap">
+        <div class="stripe amber"></div>
+        <div class="inner">
+          <div class="phase-head">
+            <span class="icon">🔥</span>
+            <span class="title">Warm-Up With the Ball</span>
+            <span class="dur">3–4 min</span>
+          </div>
+          <ul class="bullet-list">
+            <li><span class="dot amber"></span><span>Dribble in small circles, change direction every 5 touches.</span></li>
+            <li><span class="dot amber"></span><span>Alternate feet — left, right, left, right — keep it smooth.</span></li>
+            <li><span class="dot amber"></span><span>Add a few toe taps or step-overs just to wake up coordination.</span></li>
+            <li><span class="dot amber"></span><span><em>Goal: get a feel for the ball, loosen up — no rushing.</em></span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="core-block" style="margin-bottom:12px;">
+      <div class="core-head">
+        <span class="icon">⚽</span>
+        <span class="title">Core Technical Focus</span>
+        <span class="dur">8–10 min</span>
+      </div>
+      <div class="core-cols">
+        <div class="core-col video">
+          <div class="col-label">📹 Video-Guided Days</div>
+          <ul class="bullet-list">
+            <li><span class="dot col-video"></span><span>Open today's video from the <strong>Weekly Plan</strong> tab — watch it fully first.</span></li>
+            <li><span class="dot col-video"></span><span>Immediately replicate the movements shown — do 2–3 sets of the key drill.</span></li>
+            <li><span class="dot col-video"></span><span>Focus on one thing at a time: shape, touch, or rhythm.</span></li>
+            <li><span class="dot col-video"></span><span>Rest 20–30 seconds between sets — quality over speed.</span></li>
+          </ul>
+          <div class="pointer-note">👆 Video links are on the <strong>Weekly Plan</strong> tab — tap "Watch Video" next to today's day.</div>
+        </div>
+        <div class="core-col self">
+          <div class="col-label">🏃 Self-Directed Days</div>
+          <ul class="bullet-list">
+            <li><span class="dot col-self"></span><span>Pick today's focus drill (first touch, coordination, or wall work — see weekly plan).</span></li>
+            <li><span class="dot col-self"></span><span>Do 3 rounds of the drill, resting 20–30 seconds between each.</span></li>
+            <li><span class="dot col-self"></span><span>Switch feet or directions halfway through each round.</span></li>
+            <li><span class="dot col-self"></span><span>Ask yourself: <em>'Is this touch clean? Is my body in the right position?'</em></span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="quality-section">
+      <div class="quality-header" onclick="toggleQuality()">
+        <div class="title-row">
+          <span class="icon">✓</span>
+          <span class="title">What does "clean" mean?</span>
+        </div>
+        <span class="chevron">›</span>
+      </div>
+      <div class="quality-body" id="quality-body">
+        <div class="inner">
+          <div class="quality-item">
+            <div class="label">Ball Mastery & Dribbling</div>
+            <div class="desc">Clean = you can pause mid-move and hold the ball under your foot without adjusting. No double taps, no chasing the ball.</div>
+          </div>
+          <div class="quality-item">
+            <div class="label">First Touch & Receiving</div>
+            <div class="desc">Clean = ball stays on the ground, your first touch moves it 1–2 feet away from your body, and you don't need to chase it or take an extra touch to control it.</div>
+          </div>
+          <div class="quality-item">
+            <div class="label">Wall Passing</div>
+            <div class="desc">Clean = ball returns to you within 1 meter, you receive it with one touch, and you're ready to pass again without adjusting your position.</div>
+          </div>
+          <div class="quality-item">
+            <div class="label">Coordination & Footwork</div>
+            <div class="desc">Clean = you hit the rhythm without stumbling, both feet are working, and you can complete the pattern three times in a row without stopping.</div>
+          </div>
+          <p style="margin-top:10px; font-size:11.5px; color:#fbbf24; font-style:italic;">
+            💡 If you're rushing and losing control, cut your target in half and slow down. Quality always beats speed.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-block" style="margin-bottom:12px; margin-top:12px;">
+      <div class="stripe-wrap">
+        <div class="stripe purple"></div>
+        <div class="inner">
+          <div class="phase-head">
+            <span class="icon">🎯</span>
+            <span class="title">Short Challenge or Constraint</span>
+            <span class="dur">3–4 min</span>
+          </div>
+          <ul class="bullet-list">
+            <li><span class="dot purple"></span><span>Apply what you just practiced in a mini-challenge (e.g., '10 clean first touches in a row without losing the ball').</span></li>
+            <li><span class="dot purple"></span><span>Set a small, honest goal — it should feel achievable but not easy.</span></li>
+            <li><span class="dot purple"></span><span>If you hit it, try to beat it. If not, that's your target for next time.</span></li>
+            <li><span class="dot purple"></span><span><em>End on a positive rep — finish with a clean, confident touch.</em></span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-block" style="margin-bottom:12px;">
+      <div class="stripe-wrap">
+        <div class="stripe green"></div>
+        <div class="inner">
+          <div class="phase-head">
+            <span class="icon">🌙</span>
+            <span class="title">Cool-Down</span>
+            <span class="dur">1–2 min</span>
+          </div>
+          <ul class="bullet-list">
+            <li><span class="dot green"></span><span>Dribble slowly, no pressure — just enjoy the ball at your feet.</span></li>
+            <li><span class="dot green"></span><span>Think: <em>'What was one thing I did well today?'</em></span></li>
+            <li><span class="dot green"></span><span>Stretch legs gently for 30 seconds each side.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="total-pill">⏱️ Total Session: 15–20 minutes</div>
+  </section>
+
+  <section class="panel" data-panel="2" role="tabpanel">
+    
+    <div class="info-box amber" style="margin-bottom:18px;">
+      <strong>⚠️ What if I miss my target?</strong><br>
+      Progress isn't linear — bad days happen. If you miss your success criterion <strong>2 sessions in a row</strong>, drop back to the previous week's target. No shame, no stress — that's smart training. Ask yourself: <em>"What was different? Sleep? Surface? Distraction?"</em> This helps you learn what affects your performance without blaming yourself.
+    </div>
+
+    <div id="progression-cards" style="display:flex; flex-direction:column; gap:14px;"></div>
+  </section>
+
+  <section class="panel" data-panel="3" role="tabpanel">
+    <div class="info-box purple">
+      These are the <strong>mental and technical reminders</strong> Benjamin should keep in mind during every session.
+      He doesn't need to focus on all of them at once — just one or two per day.
+    </div>
+    <div class="cues-grid" id="cues-grid"></div>
+  </section>
+
+  <section class="panel" data-panel="4" role="tabpanel">
+    <div class="info-box green">
+      Consistency matters more than perfection. These tips are designed to keep Benjamin motivated and on track — without adding stress.
+    </div>
+    <div id="tips-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+  </section>
+
+  <footer class="footer">
+    Video Capsules open in Google Drive — make sure you're signed into the right account.<br>
+    This plan is part of Benjamin's Individual Development Plan (IDP).<br>
+    Review and adjust every 4 weeks with your coach.
+  </footer>
+</div>
+
+<script>
+const capsules = [
+  { title: '"V" Behind + Neymar Turn',   url: 'https://drive.google.com/file/d/1isLcaCUo3JIm3anrIOP5fZLWF4fCiU8r/view?usp=sharing' },
+  { title: 'Croqueta + Outside "V"',     url: 'https://drive.google.com/file/d/1T1_2IyVY5NQISkX5YIh3F2XOuTSDkW3y/view?usp=sharing' },
+  { title: 'Maradona + Hook',            url: 'https://drive.google.com/file/d/1G8LR-7ybGMtmZPahvPjiT9sPAMz-l8Do/view?usp=sharing' },
+  { title: '"V" in Front + "V" Behind',  url: 'https://drive.google.com/file/d/1OK2kC_BA6Op4x2co-fi_CI5--gANlvTf/view?usp=sharing' },
+  { title: 'Hook + Cruyff Turn',         url: 'https://drive.google.com/file/d/1_PXUZHC-PzARaOHrnFXIaE9Ld5HHNcsQ/view?usp=sharing' },
+];
+
+const rotations = [
+  [0, 1, 2],
+  [3, 4, 0],
+];
+
+const weekDays = [
+  { day:'Monday',    type:'video',  label:'Video-Guided',    focus:'Ball Mastery Capsule + structured warm-up & challenge',  videoSlot:0 },
+  { day:'Tuesday',   type:'self',   label:'Self-Directed',   focus:'First touch & receiving drill work',                   refUrl:'https://www.youtube.com/shorts/-49Pr1xlUpA', refTitle:'First Touch & Receiving' },
+  { day:'Wednesday', type:'video',  label:'Video-Guided',    focus:'Ball Mastery Capsule + wall work or ground moves',      videoSlot:1 },
+  { day:'Thursday',  type:'self',   label:'Self-Directed',   focus:'Coordination & footwork patterns',                     refUrl:'https://www.youtube.com/shorts/5nOokRBlRBM', refTitle:'Coordination & Footwork' },
+  { day:'Friday',    type:'video',  label:'Video-Guided',    focus:'Ball Mastery Capsule + pressure simulation',            videoSlot:2 },
+  { day:'Saturday',  type:'self',   label:'Self-Directed',   focus:'Free exploration + light challenge' },
+  { day:'Sunday',    type:'rest',   label:'Rest / Recovery', focus:'Full rest — no technical work' },
+];
+
+const progression = [
+  { week:1, theme:'Build the Habit', color:'#3b82f6',
+    focus:'Learn the routine. Get comfortable with the session structure.',
+    details:['Drills are introduced at base level — no added pressure',
+             'Video capsules are watched fully before practicing',
+             'Challenges are simple: e.g., \'8 clean touches in a row\'',
+             'Goal: show up consistently, feel good with the ball'] },
+  { week:2, theme:'Add Focus', color:'#8b5cf6',
+    focus:'Start thinking about quality — what does a \'clean\' touch look like?',
+    details:['Same drills, but Benjamin now tracks one specific cue per session',
+             'Challenges increase slightly: e.g., \'10 clean touches\' or \'no mistakes in 30 seconds\'',
+             'Wall work or receiving drills introduced with movement',
+             'Video capsules used as reference — pause and rewatch if needed'] },
+  { week:3, theme:'Raise the Bar', color:'#f59e0b',
+    focus:'Introduce small pressures — speed, space, or time limits.',
+    details:['Drills now include a light constraint (e.g., smaller space, faster tempo)',
+             'Challenges involve consistency under pressure: e.g., \'12 in a row, under 45 seconds\'',
+             'Benjamin begins to self-assess: \'Was that good? Why or why not?\'',
+             'Video capsules used to compare and self-correct'] },
+  { week:4, theme:'Own It', color:'#10b981',
+    focus:'Benjamin leads. Test confidence, creativity, and independence.',
+    details:['On self-directed days, Benjamin chooses which drill to focus on',
+             'Challenges are self-set: pick a goal, try to hit it',
+             'Video capsules revisited — \'Can I do this without watching?\'',
+             'End-of-week reflection: What improved? What\'s next?'] },
+];
+
+const cues = [
+  { icon:'👀', cat:'Eyes',        text:'Look where you want the ball to go — before you touch it.' },
+  { icon:'🦵', cat:'Body Shape',  text:'Bend your knees. Keep your body low and balanced.' },
+  { icon:'🎯', cat:'Soft Touch',  text:'Cushion the ball — don\'t fight it. Let it come to you.' },
+  { icon:'🧠', cat:'One Thing',   text:'Focus on one skill at a time. Don\'t try to fix everything.' },
+  { icon:'👣', cat:'Both Feet',   text:'Always practice with both feet. Your weaker foot needs love too.' },
+  { icon:'🎵', cat:'Rhythm',      text:'Find a comfortable rhythm. Smooth beats rushed every time.' },
+  { icon:'🔄', cat:'Reset',       text:'Made a mistake? Reset, breathe, and go again. Mistakes are reps.' },
+  { icon:'💭', cat:'Visualize',   text:'Before you start, picture yourself doing it well. Then do it.' },
+];
+
+const tips = [
+  { 
+    icon:'👁️', 
+    title:'How to Support Without Coaching', 
+    text:'Your role is to notice <strong>effort and focus</strong>, not to fix technique. Let the criteria and the video do the teaching.',
+    featured: true,
+    hasDoDont: true 
+  },
+  { icon:'⏱️',  title:'Keep It Short',        text:'15–20 minutes feels manageable. Done before boredom kicks in.' },
+  { icon:'🔥',  title:'Make It a Streak',     text:'Track your days on a calendar. Seeing the streak grow is motivating.' },
+  { icon:'⭐',  title:'Let Him Own It',       text:'Let Benjamin set up, run, and finish his own session. Ownership = motivation.' },
+  { icon:'🏆',  title:'Celebrate Small Wins', text:'Hit your challenge? That counts. Say it out loud. It matters.' },
+  { icon:'😊',  title:'No Perfectionism',     text:'Some days will feel rough. That\'s fine. Showing up is the win.' },
+  { icon:'💬',  title:'Check In Weekly',      text:'Once a week, ask: \'What felt good? What was tough?\' Keep it casual.' },
+];
+
+const SVG_PLAY  = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>`;
+const SVG_CLOCK = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>`;
+const SVG_OPEN  = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+
+let activeRotation = 0;
+
+function renderWeekly() {
+  const root = document.getElementById('weekly-rows');
+  const slots = rotations[activeRotation];
+
+  root.innerHTML = weekDays.map(d => {
+    let capsuleHtml = '';
+    if (d.type === 'video') {
+      const c = capsules[slots[d.videoSlot]];
+      capsuleHtml = `<span class="capsule-name">${c.title}</span>`;
+    }
+    if (d.refUrl) {
+      capsuleHtml = `<span class="capsule-name">${d.refTitle}</span>`;
+    }
+
+    let watchBtn = '';
+    if (d.type === 'video') {
+      const c = capsules[slots[d.videoSlot]];
+      watchBtn = `
+        <a class="watch-btn" href="${c.url}" target="_blank" rel="noopener">
+          ${SVG_PLAY} Watch Video ${SVG_OPEN}
+        </a>`;
+    }
+    if (d.refUrl) {
+      watchBtn = `
+        <a class="watch-btn ref" href="${d.refUrl}" target="_blank" rel="noopener">
+          ${SVG_PLAY} Watch Video ${SVG_OPEN}
+        </a>`;
+    }
+
+    const tagIcon = d.type === 'video' ? SVG_PLAY : d.type === 'self' ? SVG_CLOCK : '—';
+
+    return `
+      <div class="week-row ${d.type}">
+        <span class="day-name">${d.day}</span>
+        <span class="tag ${d.type}">${tagIcon} ${d.label}</span>
+        <div class="mid">
+          <div class="focus">${d.focus}</div>
+          ${capsuleHtml}
+        </div>
+        ${watchBtn}
+      </div>`;
+  }).join('');
+}
+
+function renderProgression() {
+  document.getElementById('progression-cards').innerHTML = progression.map((w,i) => `
+    <div class="week-card" style="border-color:${w.color}30;">
+      <div class="wk-header" style="background:${w.color}15; border-bottom:1px solid ${w.color}22;">
+        <span class="wk-badge" style="background:${w.color};">WEEK ${w.week}</span>
+        <span class="wk-theme">${w.theme}</span>
+      </div>
+      <div class="wk-body">
+        <p class="wk-focus" style="color:${w.color};">${w.focus}</p>
+        ${w.details.map(d => `<div class="wk-detail"><span class="arrow" style="color:${w.color};">▸</span><span>${d}</span></div>`).join('')}
+      </div>
+    </div>
+    ${i < progression.length - 1 ? '<div class="progression-connector">↓ Each week builds on the last ↓</div>' : ''}
+  `).join('');
+}
+
+function renderCues() {
+  document.getElementById('cues-grid').innerHTML = cues.map(c => `
+    <div class="cue-card">
+      <div class="cue-head"><span class="cue-icon">${c.icon}</span><span class="cue-cat">${c.cat}</span></div>
+      <p class="cue-text">${c.text}</p>
+    </div>
+  `).join('');
+}
+
+function renderTips() {
+  document.getElementById('tips-list').innerHTML = tips.map(t => {
+    let extraContent = '';
+    
+    if (t.hasDoDont) {
+      extraContent = `
+        <div class="do-dont-grid">
+          <div class="do-dont-col do">
+            <div class="col-title">✅ Do</div>
+            <div class="do-dont-item">Ask "What's your target today?" at the start</div>
+            <div class="do-dont-item">Say "I saw good focus" at the end</div>
+            <div class="do-dont-item">Film a set if he asks</div>
+          </div>
+          <div class="do-dont-col dont">
+            <div class="col-title">❌ Don't</div>
+            <div class="do-dont-item">Count out loud during his drill</div>
+            <div class="do-dont-item">Give technical corrections</div>
+            <div class="do-dont-item">Compare to last week unless he brings it up</div>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="tip-card ${t.featured ? 'featured' : ''}">
+        <span class="tip-icon">${t.icon}</span>
+        <div>
+          <div class="tip-title">${t.title}</div>
+          <p class="tip-text">${t.text}</p>
+          ${extraContent}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleQuality() {
+  const header = document.querySelector('.quality-header');
+  const body   = document.getElementById('quality-body');
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected','true');
+    document.querySelector(`[data-panel="${btn.dataset.tab}"]`).classList.add('active');
+  });
+});
+
+document.querySelectorAll('.rot-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rot-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeRotation = Number(btn.dataset.rot);
+    renderWeekly();
+  });
+});
+
+renderWeekly();
+renderProgression();
+renderCues();
+renderTips();
+</script>
+</body>
+</html>
